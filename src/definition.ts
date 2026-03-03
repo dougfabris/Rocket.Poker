@@ -19,6 +19,7 @@ export interface IPokerStory {
     votes: Array<IVoter>;
     totalVotes: number;
     finished?: boolean;
+    finishedAt?: Date; // Timestamp when voting was finished
     showResults?: boolean; // Show results during voting or only when finished
 }
 

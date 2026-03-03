@@ -64,9 +64,24 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
     }
 
     if (story.finished) {
+        let finishTimeText = '✅ Voting finished';
+        if (story.finishedAt) {
+            // Format the date in a readable way (server time)
+            const finishDate = new Date(story.finishedAt);
+            const dateStr = finishDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+            });
+            const timeStr = finishDate.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+            });
+            finishTimeText = `✅ Voting finished on ${dateStr} at ${timeStr}`;
+        }
         block.addContextBlock({
             elements: [
-                block.newMarkdownTextObject(`✅ Voting finished at ${new Date().toUTCString()}`),
+                block.newMarkdownTextObject(finishTimeText),
             ],
         });
     }
