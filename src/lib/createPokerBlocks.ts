@@ -34,7 +34,7 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
         });
     }
 
-    
+
     // Add title as a header block for more visual prominence
     block.addSectionBlock({
         text: block.newMarkdownTextObject(titleText),
@@ -99,6 +99,7 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
 
         if (allVoters.length > 0) {
             block.addDividerBlock();
+            allVoters.sort((a, b) => a.toLowerCase() > b.toLowerCase() ? 1 : -1);
             block.addContextBlock({
                 elements: [
                     block.newMarkdownTextObject(`👥 **Voted** (${allVoters.length}): ${allVoters.join(', ')}`),
@@ -126,7 +127,7 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
         if (voteCount === 0) {
             return;
         }
-        
+
         const voterNames = voters
             .map(voter => showNames ? voter.name : voter.username)
             .join(', ');
