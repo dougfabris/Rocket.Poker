@@ -77,7 +77,7 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
                 hour: '2-digit',
                 minute: '2-digit',
             });
-            finishTimeText = `✅ Voting finished on ${dateStr} at ${timeStr}`;
+            finishTimeText = `✅ Voting finished ${dateStr} at ${timeStr}`;
         }
         block.addContextBlock({
             elements: [
