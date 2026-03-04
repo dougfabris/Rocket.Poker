@@ -48,6 +48,7 @@ export async function finishPokerVoting({ data, read, persistence, modify }: {
     }
 
     story.finished = true;
+    story.finishedAt = new Date();
 
     const association = new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, story.msgId);
     await persistence.updateByAssociation(association, story);
