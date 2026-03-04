@@ -6,7 +6,7 @@ import { createPokerBlocks } from './createPokerBlocks';
 import { getPokerStory } from './getPokerStory';
 import { getVotingOptions } from './getVotingOptions';
 
-export async function finishPokerVoting({ data, read, persistence, modify }: {
+export async function closePokerVoting({ data, read, persistence, modify }: {
     data: IUIKitBlockIncomingInteraction,
     read: IRead,
     persistence: IPersistence,
@@ -23,8 +23,8 @@ export async function finishPokerVoting({ data, read, persistence, modify }: {
         throw new Error('Story not found');
     }
 
-    if (story.finished) {
-        throw new Error('Voting has already finished');
+    if (story.closed) {
+        throw new Error('Voting is already closed');
     }
 
     // Check if the user is the room owner
@@ -38,7 +38,7 @@ export async function finishPokerVoting({ data, read, persistence, modify }: {
         const message = modify.getCreator().startMessage()
             .setSender(appUser)
             .setRoom(data.room!)
-            .setText('❌ Only the session owner can finish voting.');
+            .setText('❌ Only the session owner can close voting.');
         
         await notifier.notifyUser(data.user, message.getMessage());
         
@@ -47,7 +47,8 @@ export async function finishPokerVoting({ data, read, persistence, modify }: {
         };
     }
 
-    story.finished = true;
+    story.closed = true;
+    story.closedAt = new Date();
 
     const association = new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, story.msgId);
     await persistence.updateByAssociation(association, story);

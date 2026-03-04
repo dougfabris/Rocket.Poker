@@ -6,7 +6,7 @@ import { createPokerBlocks } from './createPokerBlocks';
 import { getPokerStory } from './getPokerStory';
 import { getVotingOptions } from './getVotingOptions';
 
-export async function reopenPokerVoting({ data, read, persistence, modify }: {
+export async function openPokerVoting({ data, read, persistence, modify }: {
     data: IUIKitBlockIncomingInteraction,
     read: IRead,
     persistence: IPersistence,
@@ -23,8 +23,8 @@ export async function reopenPokerVoting({ data, read, persistence, modify }: {
         throw new Error('Story not found');
     }
 
-    if (!story.finished) {
-        throw new Error('Voting is still open');
+    if (!story.closed) {
+        throw new Error('Voting is already open');
     }
 
     // Check if the user is the room owner
@@ -38,7 +38,7 @@ export async function reopenPokerVoting({ data, read, persistence, modify }: {
         const message = modify.getCreator().startMessage()
             .setSender(appUser)
             .setRoom(data.room!)
-            .setText('❌ Only the session owner can reopen voting.');
+            .setText('❌ Only the session owner can open voting.');
         
         await notifier.notifyUser(data.user, message.getMessage());
         
@@ -47,7 +47,7 @@ export async function reopenPokerVoting({ data, read, persistence, modify }: {
         };
     }
 
-    story.finished = false;
+    story.closed = false;
 
     const association = new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, story.msgId);
     await persistence.updateByAssociation(association, story);
@@ -60,13 +60,9 @@ export async function reopenPokerVoting({ data, read, persistence, modify }: {
     const showNames = await read.getEnvironmentReader().getSettings().getById('use-user-name');
     const votingOptions = await getVotingOptions(read);
 
-    createPokerBlocks(block, story, showNames.value as boolean, votingOptions);
+    createPokerBlocks(block, story, showNames.value, votingOptions);
 
     message.setBlocks(block);
 
-    await modify.getUpdater().finish(message);
-
-    return {
-        success: true,
-    };
+    return modify.getUpdater().finish(message);
 }

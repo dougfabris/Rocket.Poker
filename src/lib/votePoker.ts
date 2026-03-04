@@ -23,8 +23,8 @@ export async function votePoker({ data, read, persistence, modify }: {
         throw new Error('Story not found');
     }
 
-    if (story.finished) {
-        throw new Error('Voting has already finished');
+    if (story.closed) {
+        throw new Error('Voting is closed');
     }
 
     // Check if user is a member of the discussion
