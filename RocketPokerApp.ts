@@ -21,8 +21,8 @@ import { RocketPokerHelpCommand } from './src/RocketPokerHelpCommand';
 import { createPokerStoryModal } from './src/lib/createPokerStoryModal';
 import { createPokerMessage } from './src/lib/createPokerMessage';
 import { votePoker } from './src/lib/votePoker';
-import { finishPokerVoting } from './src/lib/finishPokerVoting';
-import { reopenPokerVoting } from './src/lib/reopenPokerVoting';
+import { openPokerVoting } from './src/lib/openPokerVoting';
+import { closePokerVoting } from './src/lib/closePokerVoting';
 
 export class RocketPokerApp extends App implements IUIKitInteractionHandler {
     private readonly appLogger: ILogger
@@ -103,15 +103,7 @@ export class RocketPokerApp extends App implements IUIKitInteractionHandler {
             }
 
             case 'finishVoting': {
-                await finishPokerVoting({ data, read, persistence, modify });
-
-                return {
-                    success: true,
-                };
-            }
-
-            case 'reopenVoting': {
-                await reopenPokerVoting({ data, read, persistence, modify });
+                await closePokerVoting({ data, read, persistence, modify });
 
                 return {
                     success: true,
@@ -125,11 +117,11 @@ export class RocketPokerApp extends App implements IUIKitInteractionHandler {
                     return { success: false };
                 }
 
-                if (action === 'finish') {
-                    await finishPokerVoting({ data, read, persistence, modify });
+                if (action === 'start' || action === 'reopen') {
+                    await openPokerVoting({ data, read, persistence, modify });
                     return { success: true };
-                } else if (action === 'reopen') {
-                    await reopenPokerVoting({ data, read, persistence, modify });
+                } else if (action === 'finish') {
+                    await closePokerVoting({ data, read, persistence, modify });
                     return { success: true };
                 } else if (action === 'edit') {
                     // Open edit modal with existing story data

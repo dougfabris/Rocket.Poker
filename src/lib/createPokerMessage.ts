@@ -78,7 +78,7 @@ export async function createPokerMessage(data: IUIKitViewSubmitIncomingInteracti
             msgId: '',
             totalVotes: 0,
             votes: votingOptions.map(() => ({ quantity: 0, voters: [] })),
-            finished: false,
+            closed: true, // Stories start with voting closed
             showResults: visibility === 'open', // Show results in real-time for open voting
         };
 
