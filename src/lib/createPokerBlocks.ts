@@ -46,10 +46,18 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
                     text: block.newPlainTextObject('Edit story'),
                     value: 'edit',
                 },
-                {
-                    text: block.newPlainTextObject(story.finished ? 'Reopen Voting' : 'Finish Voting'),
-                    value: story.finished ? 'reopen' : 'finish',
-                },
+                ...(story.closed && !story.closedAt ? [{
+                    text: block.newPlainTextObject('Open voting'),
+                    value: 'start',
+                }] : []),
+                ...(story.closed && story.closedAt ? [{
+                    text: block.newPlainTextObject('Reopen voting'),
+                    value: 'reopen',
+                }] : []),
+                ...(!story.closed ? [{
+                    text: block.newPlainTextObject('Close voting'),
+                    value: 'finish',
+                }] : []),
             ],
         },
     });
@@ -63,31 +71,43 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
         });
     }
 
-    if (story.finished) {
-        let finishTimeText = '✅ Voting finished';
-        if (story.finishedAt) {
-            // Format the date in a readable way (server time)
-            const finishDate = new Date(story.finishedAt);
-            const dateStr = finishDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-            });
-            const timeStr = finishDate.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-            });
-            finishTimeText = `✅ Voting finished ${dateStr} at ${timeStr}`;
-        }
+    // Add voting status indicator
+    if (story.closed && story.closedAt) {
+        // Voting has been closed at least once
+        const closeDate = new Date(story.closedAt);
+        const dateStr = closeDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+        });
+        const timeStr = closeDate.toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+        });
+        const closeTimeText = `✅ Voting closed on ${dateStr} at ${timeStr}`;
         block.addContextBlock({
             elements: [
-                block.newMarkdownTextObject(finishTimeText),
+                block.newMarkdownTextObject(closeTimeText),
+            ],
+        });
+    } else if (!story.closed) {
+        // Show voting in progress indicator
+        block.addContextBlock({
+            elements: [
+                block.newMarkdownTextObject('🗳️ **Voting in progress** - Cast your vote below'),
+            ],
+        });
+    } else {
+        // Voting not started yet (closed but no closedAt)
+        block.addContextBlock({
+            elements: [
+                block.newMarkdownTextObject('⏸️ **Voting not started** - Waiting for session owner to open voting'),
             ],
         });
     }
 
-    // Create voting buttons
-    if (!story.finished) {
+    // Create voting buttons (only when voting is open)
+    if (!story.closed) {
         const buttonElements = votingOptions.map((option, index) => {
             return block.newButtonElement({
                 actionId: 'votePoker',
@@ -123,9 +143,9 @@ export function createPokerBlocks(block: BlockBuilder, story: IPokerStory, showN
         }
     }
 
-    // Show voting results (only if showResults is true or voting is finished)
-    if (!story.showResults && !story.finished) {
-        // Don't show results during voting if closed
+    // Show voting results (only if showResults is true or voting is closed)
+    if (!story.showResults && !story.closed) {
+        // Don't show results during voting unless showResults is enabled
         return;
     }
 
