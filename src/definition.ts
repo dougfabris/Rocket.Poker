@@ -18,8 +18,8 @@ export interface IPokerStory {
     description?: string;
     votes: Array<IVoter>;
     totalVotes: number;
-    closed: boolean; // Whether voting is closed (true = closed, false = open)
-    closedAt?: Date; // Timestamp when voting was closed for the first time
+    closed: boolean;
+    closedAt?: Date; // Timestamp when voting was closed
     showResults?: boolean; // Show results during voting or only when closed
 }
 
