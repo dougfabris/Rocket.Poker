@@ -18,8 +18,9 @@ export interface IPokerStory {
     description?: string;
     votes: Array<IVoter>;
     totalVotes: number;
-    finished?: boolean;
-    showResults?: boolean; // Show results during voting or only when finished
+    closed: boolean;
+    closedAt?: Date; // Timestamp when voting was closed
+    showResults?: boolean; // Show results during voting or only when closed
 }
 
 export interface IModalContext extends Partial<IUIKitBlockIncomingInteraction> {
